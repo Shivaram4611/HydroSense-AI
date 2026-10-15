@@ -1,1 +1,1 @@
-[Live Hosted website](https://dark-butterfly-797.linkyhost.com)
+[Live Hosted website](https://hydrosense-ai.netlify.app)
