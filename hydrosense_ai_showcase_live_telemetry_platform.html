@@ -1,0 +1,1528 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HydroSense AI - Smart Clean Water Security & Early-Warning Grid</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Google Fonts: Space Grotesk & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Tailwind Configuration -->
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              dark: '#030712',
+              slate: '#0b1324',
+              surface: '#111e38',
+              card: '#162544',
+              border: '#1e335a',
+              cyan: '#06b6d4',
+              teal: '#14b8a6',
+              emerald: '#10b981',
+              warning: '#f59e0b',
+              danger: '#ef4444'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Space Grotesk', 'sans-serif']
+          },
+          boxShadow: {
+            'glow-cyan': '0 0 25px -5px rgba(6, 182, 212, 0.35)',
+            'glow-teal': '0 0 25px -5px rgba(20, 184, 166, 0.35)',
+            'glow-danger': '0 0 25px -5px rgba(239, 68, 68, 0.45)'
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #0b1324; }
+    ::-webkit-scrollbar-thumb { background: #1e335a; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #06b6d4; }
+    
+    /* Water grid animated pulse line */
+    @keyframes flowPulse {
+      0% { stroke-dashoffset: 100; }
+      100% { stroke-dashoffset: 0; }
+    }
+    .flow-line {
+      stroke-dasharray: 8;
+      animation: flowPulse 2s linear infinite;
+    }
+    .flow-danger {
+      stroke: #ef4444 !important;
+      animation-duration: 0.8s;
+    }
+  </style>
+</head>
+
+<body class="bg-brand-dark text-slate-100 font-sans antialiased selection:bg-brand-cyan selection:text-brand-dark">
+
+  <!-- ================= TOP NOTIFICATION / BADGE BAR ================= -->
+  <div class="bg-brand-slate border-b border-brand-border/60 text-xs py-2 px-4 sm:px-8">
+    <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-2">
+      <div class="flex items-center space-x-3">
+        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+          <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 mr-1.5 animate-pulse"></span>
+          Telemetry System Online
+        </span>
+        <span class="text-slate-400 hidden sm:inline">IBM SkillsBuild Masterclass 5 | Real-World Impact Track</span>
+      </div>
+      <div class="flex items-center space-x-4 text-slate-400">
+        <span class="flex items-center gap-1.5"><i class="fa-solid fa-earth-americas text-brand-teal"></i> UN SDG 6: Clean Water</span>
+        <span class="hidden md:inline text-slate-600">|</span>
+        <span class="flex items-center gap-1.5"><i class="fa-solid fa-heart-pulse text-rose-400"></i> SDG 3: Health &amp; Well-being</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= NAVIGATION ================= -->
+  <nav class="sticky top-0 z-50 backdrop-blur-xl bg-brand-dark/85 border-b border-brand-border/70">
+    <div class="max-w-7xl mx-auto px-4 sm:px-8 h-18 flex items-center justify-between">
+      <div class="flex items-center space-x-3 py-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-cyan to-brand-teal flex items-center justify-center text-brand-dark shadow-glow-cyan">
+          <i class="fa-solid fa-shield-halved text-xl"></i>
+        </div>
+        <div>
+          <span class="font-display font-bold text-xl tracking-tight text-white flex items-center gap-1.5">
+            HydroSense <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-cyan to-brand-teal">AI</span>
+          </span>
+          <p class="text-[10px] text-slate-400 font-medium tracking-wider uppercase">Safe Water Security Grid</p>
+        </div>
+      </div>
+
+      <!-- Nav Links -->
+      <div class="hidden lg:flex items-center space-x-8 text-sm font-medium text-slate-300">
+        <a href="#hero" class="hover:text-brand-cyan transition-colors">Overview</a>
+        <a href="#simulation" class="hover:text-brand-cyan transition-colors">Live Grid Simulation</a>
+        <a href="#architecture" class="hover:text-brand-cyan transition-colors">AI Architecture</a>
+        <a href="#model-sandbox" class="hover:text-brand-cyan transition-colors">ML Sandbox</a>
+        <a href="#lean-canvas" class="hover:text-brand-cyan transition-colors">Lean Canvas</a>
+        <a href="#calculator" class="hover:text-brand-cyan transition-colors">SDG 6 Impact</a>
+      </div>
+
+      <!-- Action Button -->
+      <div class="flex items-center space-x-3">
+        <button onclick="exportAuditReport()" class="px-4 py-2 rounded-xl text-xs font-semibold bg-brand-card hover:bg-brand-surface border border-brand-border text-slate-200 transition-all flex items-center gap-2">
+          <i class="fa-solid fa-file-arrow-down text-brand-cyan"></i>
+          <span class="hidden sm:inline">Export Audit</span>
+        </button>
+        <a href="#simulation" class="px-4 py-2 rounded-xl text-xs font-semibold bg-gradient-to-r from-brand-cyan to-brand-teal text-brand-dark hover:brightness-110 transition-all shadow-glow-cyan flex items-center gap-2">
+          <i class="fa-solid fa-satellite-dish"></i>
+          <span>Launch Simulator</span>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ================= SECTION 1: HERO & IMPACT OVERVIEW ================= -->
+  <section id="hero" class="relative pt-12 pb-20 overflow-hidden">
+    <!-- Ambient Background Glows -->
+    <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[650px] h-[350px] bg-brand-cyan/10 blur-[130px] rounded-full pointer-events-none"></div>
+    <div class="absolute top-1/3 left-1/4 w-[350px] h-[350px] bg-brand-teal/10 blur-[100px] rounded-full pointer-events-none"></div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-8 relative z-10">
+      <div class="text-center max-w-3xl mx-auto">
+        <div class="inline-flex items-center space-x-2 px-3 py-1.5 rounded-full bg-brand-surface border border-brand-border text-xs text-brand-cyan mb-6">
+          <i class="fa-solid fa-droplet text-brand-teal animate-bounce"></i>
+          <span>Smart Security System for Clean Drinking Water Networks</span>
+        </div>
+
+        <h1 class="font-display font-extrabold text-4xl sm:text-5xl lg:text-6xl text-white tracking-tight leading-[1.15] mb-6">
+          Autonomous Water Quality Telemetry &amp;
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-cyan via-teal-300 to-brand-emerald">
+            Early Contamination Defense
+          </span>
+        </h1>
+
+        <p class="text-base sm:text-lg text-slate-300 leading-relaxed mb-8 max-w-2xl mx-auto">
+          Replacing slow manual water testing with multi-parameter IoT probes and predictive machine learning models to detect chemical and biological threats in seconds, stopping waterborne outbreaks before taps turn on.
+        </p>
+
+        <div class="flex flex-wrap justify-center items-center gap-4">
+          <a href="#simulation" class="px-6 py-3.5 rounded-xl font-semibold text-sm bg-gradient-to-r from-brand-cyan to-brand-teal text-brand-dark hover:shadow-glow-cyan hover:scale-[1.02] transition-all flex items-center gap-2">
+            <i class="fa-solid fa-play"></i>
+            Live Network Simulation
+          </a>
+          <button onclick="openLeanCanvasModal()" class="px-6 py-3.5 rounded-xl font-semibold text-sm bg-brand-card hover:bg-brand-surface border border-brand-border text-slate-200 transition-all flex items-center gap-2">
+            <i class="fa-solid fa-table-cells-large text-brand-teal"></i>
+            View Lean Canvas (Pitch Model)
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick KPI Strip -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-16">
+        <div class="bg-brand-surface/70 backdrop-blur-md border border-brand-border/70 p-5 rounded-2xl relative overflow-hidden group hover:border-brand-cyan/50 transition-all">
+          <div class="flex justify-between items-start mb-2">
+            <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">Active Grid Nodes</span>
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+          </div>
+          <div class="text-3xl font-display font-bold text-white mb-1" id="kpi-nodes">48 / 48</div>
+          <p class="text-xs text-brand-teal flex items-center gap-1">
+            <i class="fa-solid fa-circle-check"></i> 100% telemetry online
+          </p>
+        </div>
+
+        <div class="bg-brand-surface/70 backdrop-blur-md border border-brand-border/70 p-5 rounded-2xl relative overflow-hidden group hover:border-brand-cyan/50 transition-all">
+          <div class="flex justify-between items-start mb-2">
+            <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">Volume Certified Safe</span>
+            <i class="fa-solid fa-faucet-drip text-brand-cyan text-sm"></i>
+          </div>
+          <div class="text-3xl font-display font-bold text-white mb-1">12.4M <span class="text-sm font-normal text-slate-400">Liters</span></div>
+          <p class="text-xs text-slate-300">Continuous 24/7 validation</p>
+        </div>
+
+        <div class="bg-brand-surface/70 backdrop-blur-md border border-brand-border/70 p-5 rounded-2xl relative overflow-hidden group hover:border-brand-cyan/50 transition-all">
+          <div class="flex justify-between items-start mb-2">
+            <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">Alert Latency</span>
+            <i class="fa-solid fa-bolt text-amber-400 text-sm"></i>
+          </div>
+          <div class="text-3xl font-display font-bold text-brand-cyan mb-1">&lt; 90 <span class="text-sm font-normal text-slate-400">sec</span></div>
+          <p class="text-xs text-slate-300">vs. 48 hrs standard lab testing</p>
+        </div>
+
+        <div class="bg-brand-surface/70 backdrop-blur-md border border-brand-border/70 p-5 rounded-2xl relative overflow-hidden group hover:border-brand-cyan/50 transition-all">
+          <div class="flex justify-between items-start mb-2">
+            <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">Outbreaks Prevented</span>
+            <i class="fa-solid fa-shield-virus text-emerald-400 text-sm"></i>
+          </div>
+          <div class="text-3xl font-display font-bold text-emerald-400 mb-1" id="kpi-incidents-prevented">14</div>
+          <p class="text-xs text-slate-300">Auto-isolated before taps</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= SECTION 2: LIVE SIMULATOR & DASHBOARD ================= -->
+  <section id="simulation" class="py-16 bg-brand-slate border-y border-brand-border/80">
+    <div class="max-w-7xl mx-auto px-4 sm:px-8">
+      
+      <!-- Section Header -->
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-8">
+        <div>
+          <div class="inline-flex items-center gap-2 text-xs font-bold text-brand-cyan uppercase tracking-wider mb-2">
+            <i class="fa-solid fa-network-wired"></i> Real-Time Digital Twin &amp; Control Matrix
+          </div>
+          <h2 class="text-2xl sm:text-3xl font-display font-bold text-white">Live Water Distribution Telemetry</h2>
+          <p class="text-sm text-slate-400 max-w-xl">
+            Simulate real-world contamination spikes or structural pipe degradation. Watch the automated AI isolation algorithms react in sub-second intervals.
+          </p>
+        </div>
+
+        <!-- Simulation Control Buttons -->
+        <div class="flex flex-wrap items-center gap-2.5">
+          <button onclick="triggerContaminationSpike()" class="px-3.5 py-2 rounded-xl text-xs font-semibold bg-rose-500/20 text-rose-300 hover:bg-rose-500/30 border border-rose-500/30 transition-all flex items-center gap-2">
+            <i class="fa-solid fa-biohazard text-rose-400"></i>
+            Inject Contamination Spike
+          </button>
+          <button onclick="triggerPipeBurst()" class="px-3.5 py-2 rounded-xl text-xs font-semibold bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 border border-amber-500/30 transition-all flex items-center gap-2">
+            <i class="fa-solid fa-triangle-exclamation text-amber-400"></i>
+            Simulate Pipe Wear / Burst
+          </button>
+          <button onclick="resetSimulation()" class="px-3.5 py-2 rounded-xl text-xs font-semibold bg-brand-card hover:bg-brand-surface text-slate-300 border border-brand-border transition-all flex items-center gap-1.5">
+            <i class="fa-solid fa-rotate-left"></i>
+            Reset to Nominal
+          </button>
+        </div>
+      </div>
+
+      <!-- Main Simulation Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Left: Sector Nodes Selector & Network Map (5 cols) -->
+        <div class="lg:col-span-5 space-y-6">
+          
+          <!-- Node Selector Cards -->
+          <div class="bg-brand-card/90 border border-brand-border rounded-2xl p-4">
+            <div class="flex items-center justify-between mb-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">
+              <span>Select Active Node Telemetry</span>
+              <span id="active-node-tag" class="text-brand-cyan">Node A Selected</span>
+            </div>
+            
+            <div class="grid grid-cols-3 gap-2">
+              <button onclick="selectNode('A')" id="btn-node-A" class="p-3 rounded-xl border border-brand-cyan/60 bg-brand-surface text-left transition-all">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-xs font-bold text-white">Node A</span>
+                  <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                </div>
+                <p class="text-[11px] text-slate-300 font-medium">Municipal Main</p>
+                <p class="text-[10px] text-slate-400">Metro Water Board</p>
+              </button>
+
+              <button onclick="selectNode('B')" id="btn-node-B" class="p-3 rounded-xl border border-brand-border bg-brand-dark/50 text-left hover:border-slate-500 transition-all">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-xs font-bold text-white">Node B</span>
+                  <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                </div>
+                <p class="text-[11px] text-slate-300 font-medium">Rural Outpost</p>
+                <p class="text-[10px] text-slate-400">Borewell &amp; Feeder</p>
+              </button>
+
+              <button onclick="selectNode('C')" id="btn-node-C" class="p-3 rounded-xl border border-brand-border bg-brand-dark/50 text-left hover:border-slate-500 transition-all">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-xs font-bold text-white">Node C</span>
+                  <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                </div>
+                <p class="text-[11px] text-slate-300 font-medium">Industrial Inflow</p>
+                <p class="text-[10px] text-slate-400">High-Purity Buffer</p>
+              </button>
+            </div>
+          </div>
+
+          <!-- Interactive Schematic Network Map -->
+          <div class="bg-brand-card/90 border border-brand-border rounded-2xl p-5 relative overflow-hidden">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2">
+                <i class="fa-solid fa-map-location-dot text-brand-cyan"></i>
+                Distribution Network Visualizer
+              </h3>
+              <div id="grid-status-badge" class="px-2 py-0.5 rounded text-[11px] font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                Pipes Pressurized: Normal
+              </div>
+            </div>
+
+            <!-- SVG Water Network Canvas -->
+            <div class="w-full h-52 bg-brand-dark/80 rounded-xl relative border border-brand-border flex items-center justify-center p-2">
+              <svg viewBox="0 0 450 200" class="w-full h-full">
+                <!-- Water distribution pipes -->
+                <path id="pipe-ab" d="M 60 100 L 225 60" stroke="#06b6d4" stroke-width="4" fill="none" class="flow-line" />
+                <path id="pipe-bc" d="M 225 60 L 390 130" stroke="#06b6d4" stroke-width="4" fill="none" class="flow-line" />
+                <path id="pipe-ca" d="M 390 130 L 225 170 L 60 100" stroke="#06b6d4" stroke-width="3" fill="none" class="flow-line" opacity="0.6" />
+
+                <!-- Node A: Municipal Reservoir -->
+                <g class="cursor-pointer" onclick="selectNode('A')">
+                  <circle cx="60" cy="100" r="22" fill="#111e38" stroke="#06b6d4" stroke-width="2" />
+                  <circle id="map-dot-A" cx="60" cy="100" r="10" fill="#10b981" />
+                  <text x="60" y="140" fill="#94a3b8" font-size="10" text-anchor="middle" font-weight="bold">Node A (Metro)</text>
+                </g>
+
+                <!-- Node B: Rural Branch -->
+                <g class="cursor-pointer" onclick="selectNode('B')">
+                  <circle cx="225" cy="60" r="22" fill="#111e38" stroke="#06b6d4" stroke-width="2" />
+                  <circle id="map-dot-B" cx="225" cy="60" r="10" fill="#10b981" />
+                  <text x="225" y="30" fill="#94a3b8" font-size="10" text-anchor="middle" font-weight="bold">Node B (Rural)</text>
+                </g>
+
+                <!-- Node C: Industrial Park -->
+                <g class="cursor-pointer" onclick="selectNode('C')">
+                  <circle cx="390" cy="130" r="22" fill="#111e38" stroke="#06b6d4" stroke-width="2" />
+                  <circle id="map-dot-C" cx="390" cy="130" r="10" fill="#10b981" />
+                  <text x="390" y="170" fill="#94a3b8" font-size="10" text-anchor="middle" font-weight="bold">Node C (Industrial)</text>
+                </g>
+
+                <!-- Automated Valve Markers -->
+                <g id="valve-indicator" transform="translate(138, 75)">
+                  <polygon points="0,0 12,8 0,16" fill="#10b981" />
+                  <polygon points="24,0 12,8 24,16" fill="#10b981" />
+                  <circle cx="12" cy="8" r="3" fill="#ffffff" />
+                </g>
+              </svg>
+              
+              <!-- Map Overlay Legend -->
+              <div class="absolute bottom-2 left-3 text-[10px] text-slate-400 bg-brand-dark/80 px-2 py-1 rounded border border-brand-border">
+                <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 mr-1"></span> Automated Solenoid Valve Open
+              </div>
+            </div>
+
+            <!-- Active Node Micro-Status -->
+            <div class="mt-4 pt-3 border-t border-brand-border/60 flex items-center justify-between text-xs">
+              <span class="text-slate-400">Current Node Isolation State:</span>
+              <span id="valve-state-text" class="font-semibold text-emerald-400">Open (Normal Flow)</span>
+            </div>
+          </div>
+
+          <!-- Alert Feed Box -->
+          <div class="bg-brand-card/90 border border-brand-border rounded-2xl p-5">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2">
+                <i class="fa-solid fa-clock-rotate-left text-brand-teal"></i>
+                Telemetry Event Stream
+              </h3>
+              <button onclick="clearAlertLogs()" class="text-[11px] text-slate-400 hover:text-slate-200">Clear Logs</button>
+            </div>
+            
+            <div id="alert-logs" class="space-y-2 max-h-48 overflow-y-auto pr-1 text-xs font-mono">
+              <div class="p-2 rounded bg-brand-surface/70 border-l-2 border-emerald-400 text-slate-300 flex items-center justify-between">
+                <span>[SYS_INIT] All multi-sensor telemetry nodes online.</span>
+                <span class="text-[10px] text-slate-500">Just now</span>
+              </div>
+              <div class="p-2 rounded bg-brand-surface/70 border-l-2 border-cyan-400 text-slate-300 flex items-center justify-between">
+                <span>[AI_CALIBRATION] Local baseline profile verified.</span>
+                <span class="text-[10px] text-slate-500">2m ago</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Right: Telemetry Gauges, Live Charts & ML Indicators (7 cols) -->
+        <div class="lg:col-span-7 space-y-6">
+          
+          <!-- Live Sensor Readings Grid -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            
+            <!-- pH Level -->
+            <div class="bg-brand-card/90 border border-brand-border rounded-xl p-3.5 relative overflow-hidden">
+              <div class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">pH Level</div>
+              <div class="flex items-baseline gap-1 my-1">
+                <span id="val-ph" class="text-2xl font-display font-bold text-white">7.24</span>
+                <span class="text-xs text-slate-400">pH</span>
+              </div>
+              <div class="w-full bg-brand-dark/70 rounded-full h-1.5 overflow-hidden">
+                <div id="bar-ph" class="bg-emerald-400 h-1.5 rounded-full transition-all duration-500" style="width: 72%"></div>
+              </div>
+              <p id="label-ph" class="text-[10px] text-emerald-400 mt-1.5">Nominal (6.5 - 8.5)</p>
+            </div>
+
+            <!-- Turbidity -->
+            <div class="bg-brand-card/90 border border-brand-border rounded-xl p-3.5 relative overflow-hidden">
+              <div class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Turbidity</div>
+              <div class="flex items-baseline gap-1 my-1">
+                <span id="val-turbidity" class="text-2xl font-display font-bold text-white">1.12</span>
+                <span class="text-xs text-slate-400">NTU</span>
+              </div>
+              <div class="w-full bg-brand-dark/70 rounded-full h-1.5 overflow-hidden">
+                <div id="bar-turbidity" class="bg-cyan-400 h-1.5 rounded-full transition-all duration-500" style="width: 22%"></div>
+              </div>
+              <p id="label-turbidity" class="text-[10px] text-cyan-400 mt-1.5">Clear (&lt; 5 NTU)</p>
+            </div>
+
+            <!-- Heavy Metals -->
+            <div class="bg-brand-card/90 border border-brand-border rounded-xl p-3.5 relative overflow-hidden">
+              <div class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Heavy Metals</div>
+              <div class="flex items-baseline gap-1 my-1">
+                <span id="val-metals" class="text-2xl font-display font-bold text-white">0.02</span>
+                <span class="text-xs text-slate-400">ppm</span>
+              </div>
+              <div class="w-full bg-brand-dark/70 rounded-full h-1.5 overflow-hidden">
+                <div id="bar-metals" class="bg-emerald-400 h-1.5 rounded-full transition-all duration-500" style="width: 8%"></div>
+              </div>
+              <p id="label-metals" class="text-[10px] text-emerald-400 mt-1.5">Safe Threshold</p>
+            </div>
+
+            <!-- Bacterial Risk Proxy -->
+            <div class="bg-brand-card/90 border border-brand-border rounded-xl p-3.5 relative overflow-hidden">
+              <div class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Pathogen Index</div>
+              <div class="flex items-baseline gap-1 my-1">
+                <span id="val-pathogen" class="text-2xl font-display font-bold text-white">4.8</span>
+                <span class="text-xs text-slate-400">%</span>
+              </div>
+              <div class="w-full bg-brand-dark/70 rounded-full h-1.5 overflow-hidden">
+                <div id="bar-pathogen" class="bg-emerald-400 h-1.5 rounded-full transition-all duration-500" style="width: 5%"></div>
+              </div>
+              <p id="label-pathogen" class="text-[10px] text-emerald-400 mt-1.5">No Threat Detected</p>
+            </div>
+          </div>
+
+          <!-- Real-Time Telemetry Graph -->
+          <div class="bg-brand-card/90 border border-brand-border rounded-2xl p-5">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+              <div>
+                <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                  <i class="fa-solid fa-chart-line text-brand-cyan"></i>
+                  Continuous Multi-Sensor Parameter Stream
+                </h3>
+                <p class="text-xs text-slate-400">Rolling window sampled every 2.5s via ESP32 telemetry emulator</p>
+              </div>
+              <div class="flex items-center space-x-3 text-xs">
+                <span class="flex items-center gap-1.5 text-cyan-400 font-medium">
+                  <span class="w-2.5 h-1 rounded-sm bg-cyan-400"></span> Turbidity (NTU)
+                </span>
+                <span class="flex items-center gap-1.5 text-emerald-400 font-medium">
+                  <span class="w-2.5 h-1 rounded-sm bg-emerald-400"></span> pH Level
+                </span>
+              </div>
+            </div>
+
+            <!-- Canvas Container -->
+            <div class="w-full h-64">
+              <canvas id="liveChart"></canvas>
+            </div>
+          </div>
+
+          <!-- Bottom: Hydraulic Pressure & Degradation Predictive Meter -->
+          <div class="bg-brand-card/90 border border-brand-border rounded-2xl p-5 grid grid-cols-1 md:grid-cols-2 gap-5">
+            
+            <!-- Pressure Bar -->
+            <div>
+              <div class="flex justify-between items-center mb-1 text-xs">
+                <span class="font-semibold text-slate-300">Hydraulic Line Pressure</span>
+                <span id="val-pressure" class="font-mono text-cyan-400">4.1 bar (Nominal)</span>
+              </div>
+              <div class="w-full bg-brand-dark rounded-full h-2 overflow-hidden my-2">
+                <div id="bar-pressure" class="bg-brand-cyan h-2 rounded-full transition-all duration-500" style="width: 65%;"></div>
+              </div>
+              <p class="text-[11px] text-slate-400">Monitors for back-siphonage and underground fissure leaks.</p>
+            </div>
+
+            <!-- ML Pipe Degradation Risk Gauge -->
+            <div>
+              <div class="flex justify-between items-center mb-1 text-xs">
+                <span class="font-semibold text-slate-300">AI Pipe Degradation Risk</span>
+                <span id="val-burst-risk" class="font-mono text-emerald-400">Low Risk (8.2%)</span>
+              </div>
+              <div class="w-full bg-brand-dark rounded-full h-2 overflow-hidden my-2">
+                <div id="bar-burst-risk" class="bg-emerald-400 h-2 rounded-full transition-all duration-500" style="width: 8.2%;"></div>
+              </div>
+              <p class="text-[11px] text-slate-400">LSTM model predicts pipe failure 14 days prior to rupture.</p>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= SECTION 3: SYSTEM ARCHITECTURE & AI PIPELINE ================= -->
+  <section id="architecture" class="py-20 relative">
+    <div class="max-w-7xl mx-auto px-4 sm:px-8">
+      
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <div class="inline-flex items-center gap-2 text-xs font-bold text-brand-teal uppercase tracking-wider mb-2">
+          <i class="fa-solid fa-layer-group"></i> Edge-to-Cloud Deep Dive
+        </div>
+        <h2 class="text-3xl sm:text-4xl font-display font-bold text-white mb-4">
+          Integrated End-to-End Architecture
+        </h2>
+        <p class="text-slate-400 text-sm sm:text-base">
+          From edge sensing hardware at municipal junctions to cloud-native predictive inference and automatic utility emergency overrides.
+        </p>
+      </div>
+
+      <!-- 4-Stage Architectural Pipeline -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 relative">
+        
+        <!-- Step 1 -->
+        <div class="bg-brand-surface/70 border border-brand-border rounded-2xl p-6 relative group hover:border-brand-cyan/60 transition-all">
+          <div class="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-brand-cyan mb-5 text-xl">
+            <i class="fa-solid fa-microchip"></i>
+          </div>
+          <span class="text-xs font-mono text-brand-cyan uppercase">Layer 01: Edge Sensing</span>
+          <h3 class="text-lg font-display font-bold text-white mt-1 mb-2">IoT Sensor Array</h3>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            Industrial submersible probes measuring pH, Electrical Conductivity, Turbidity, ORP, and Heavy Metal optical density in continuous high-frequency flow.
+          </p>
+          <div class="mt-4 pt-3 border-t border-brand-border/60 text-[11px] text-slate-400 font-mono">
+            Protocol: Modbus RS485 / ADC
+          </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="bg-brand-surface/70 border border-brand-border rounded-2xl p-6 relative group hover:border-brand-cyan/60 transition-all">
+          <div class="w-12 h-12 rounded-xl bg-teal-500/10 border border-teal-500/30 flex items-center justify-center text-brand-teal mb-5 text-xl">
+            <i class="fa-solid fa-tower-broadcast"></i>
+          </div>
+          <span class="text-xs font-mono text-brand-teal uppercase">Layer 02: Telemetry</span>
+          <h3 class="text-lg font-display font-bold text-white mt-1 mb-2">Edge Telemetry Hub</h3>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            Ultra-low-power ESP32 &amp; STM32 gateways aggregating signals with edge noise filtering. Dispatches encrypted packets via LoRaWAN (rural) or 4G LTE/MQTT (metro).
+          </p>
+          <div class="mt-4 pt-3 border-t border-brand-border/60 text-[11px] text-slate-400 font-mono">
+            Stack: LoRaWAN 868MHz / TLS MQTT
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="bg-brand-surface/70 border border-brand-border rounded-2xl p-6 relative group hover:border-brand-cyan/60 transition-all">
+          <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mb-5 text-xl">
+            <i class="fa-solid fa-brain"></i>
+          </div>
+          <span class="text-xs font-mono text-emerald-400 uppercase">Layer 03: Analytics</span>
+          <h3 class="text-lg font-display font-bold text-white mt-1 mb-2">AI Predictive Core</h3>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            Ensemble Isolation Forests identify multi-parameter shock events. Bidirectional LSTM neural networks project infrastructure stress and corrosion decay.
+          </p>
+          <div class="mt-4 pt-3 border-t border-brand-border/60 text-[11px] text-slate-400 font-mono">
+            Engine: Scikit-learn + ONNX Runtime
+          </div>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="bg-brand-surface/70 border border-brand-border rounded-2xl p-6 relative group hover:border-brand-cyan/60 transition-all">
+          <div class="w-12 h-12 rounded-xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-rose-400 mb-5 text-xl">
+            <i class="fa-solid fa-faucet"></i>
+          </div>
+          <span class="text-xs font-mono text-rose-400 uppercase">Layer 04: Action</span>
+          <h3 class="text-lg font-display font-bold text-white mt-1 mb-2">Automated Response</h3>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            Sub-second actuation sends shutdown pulses to solenoid isolation valves, dispatches SMS emergency broadcasts to utility managers, and updates health registries.
+          </p>
+          <div class="mt-4 pt-3 border-t border-brand-border/60 text-[11px] text-slate-400 font-mono">
+            API: Webhook + SCADA Relay PLC
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= SECTION 4: INTERACTIVE ML MODEL PLAYGROUND ================= -->
+  <section id="model-sandbox" class="py-16 bg-brand-slate border-y border-brand-border/80">
+    <div class="max-w-7xl mx-auto px-4 sm:px-8">
+      
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-10">
+        <div>
+          <div class="inline-flex items-center gap-2 text-xs font-bold text-brand-cyan uppercase tracking-wider mb-2">
+            <i class="fa-solid fa-sliders"></i> Algorithmic Sandbox
+          </div>
+          <h2 class="text-2xl sm:text-3xl font-display font-bold text-white">Interactive Machine Learning Model Playground</h2>
+          <p class="text-sm text-slate-400 max-w-xl">
+            Adjust distribution stress factors below to see the dynamic predictive inference engine calculate real-time Contamination Probability and Infrastructure Failure Index.
+          </p>
+        </div>
+        <button onclick="resetSliders()" class="px-4 py-2 rounded-xl text-xs font-medium bg-brand-card hover:bg-brand-surface border border-brand-border text-slate-300">
+          Reset Sliders to Baseline
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        
+        <!-- Interactive Controls (7 cols) -->
+        <div class="lg:col-span-7 bg-brand-card/90 border border-brand-border rounded-2xl p-6 space-y-6">
+          
+          <!-- Slider 1: Pipe Age -->
+          <div>
+            <div class="flex justify-between items-center text-xs mb-2">
+              <span class="font-semibold text-slate-300">Infrastructure / Pipe Age</span>
+              <span id="pipe-age-val" class="font-mono text-brand-cyan font-bold">12 Years</span>
+            </div>
+            <input type="range" id="slider-pipe-age" min="1" max="50" value="12" oninput="calculateMLRisk()" class="w-full accent-brand-cyan cursor-pointer bg-brand-dark rounded-lg h-2">
+            <div class="flex justify-between text-[10px] text-slate-500 mt-1">
+              <span>Brand New (1 yr)</span>
+              <span>Average (25 yrs)</span>
+              <span>Severe Degradation (50 yrs)</span>
+            </div>
+          </div>
+
+          <!-- Slider 2: Pressure Variability -->
+          <div>
+            <div class="flex justify-between items-center text-xs mb-2">
+              <span class="font-semibold text-slate-300">Hydraulic Pressure Fluctuations (Water Hammer)</span>
+              <span id="pressure-var-val" class="font-mono text-brand-cyan font-bold">± 0.4 bar</span>
+            </div>
+            <input type="range" id="slider-pressure-var" min="0.1" max="3.0" step="0.1" value="0.4" oninput="calculateMLRisk()" class="w-full accent-brand-cyan cursor-pointer bg-brand-dark rounded-lg h-2">
+            <div class="flex justify-between text-[10px] text-slate-500 mt-1">
+              <span>Stable Flow (±0.1)</span>
+              <span>Moderate Surges (±1.5)</span>
+              <span>Violent Stress (±3.0)</span>
+            </div>
+          </div>
+
+          <!-- Slider 3: Heavy Metal Trace -->
+          <div>
+            <div class="flex justify-between items-center text-xs mb-2">
+              <span class="font-semibold text-slate-300">Heavy Metal Contaminant Proxy (Lead/Arsenic Trace)</span>
+              <span id="metals-trace-val" class="font-mono text-brand-cyan font-bold">0.01 ppm</span>
+            </div>
+            <input type="range" id="slider-metals-trace" min="0.0" max="0.5" step="0.01" value="0.01" oninput="calculateMLRisk()" class="w-full accent-brand-cyan cursor-pointer bg-brand-dark rounded-lg h-2">
+            <div class="flex justify-between text-[10px] text-slate-500 mt-1">
+              <span>Undetectable (0.00)</span>
+              <span>WHO Limit (0.05)</span>
+              <span>Severe Toxicity (0.50 ppm)</span>
+            </div>
+          </div>
+
+          <!-- Slider 4: Turbidity Variance -->
+          <div>
+            <div class="flex justify-between items-center text-xs mb-2">
+              <span class="font-semibold text-slate-300">Turbidity &amp; Particulate Surge</span>
+              <span id="turbidity-surge-val" class="font-mono text-brand-cyan font-bold">1.2 NTU</span>
+            </div>
+            <input type="range" id="slider-turbidity-surge" min="0.5" max="25" step="0.5" value="1.2" oninput="calculateMLRisk()" class="w-full accent-brand-cyan cursor-pointer bg-brand-dark rounded-lg h-2">
+            <div class="flex justify-between text-[10px] text-slate-500 mt-1">
+              <span>Pristine (&lt;1 NTU)</span>
+              <span>Standard Drinking Limit (5 NTU)</span>
+              <span>Muddy Runoff (&gt;20 NTU)</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ML Inference Output Displays (5 cols) -->
+        <div class="lg:col-span-5 space-y-4">
+          
+          <!-- Contamination Threat Score Card -->
+          <div class="bg-brand-card/90 border border-brand-border rounded-2xl p-6 relative overflow-hidden">
+            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">AI Contamination Risk Score</span>
+            <div class="flex items-baseline gap-2 my-2">
+              <span id="ml-risk-score" class="text-4xl sm:text-5xl font-display font-extrabold text-emerald-400">12</span>
+              <span class="text-sm font-semibold text-slate-400">/ 100</span>
+            </div>
+            <div class="w-full bg-brand-dark rounded-full h-3 overflow-hidden mb-3">
+              <div id="ml-risk-bar" class="bg-emerald-400 h-3 rounded-full transition-all duration-300" style="width: 12%;"></div>
+            </div>
+            <p id="ml-risk-status" class="text-xs text-emerald-400 font-semibold flex items-center gap-1.5">
+              <i class="fa-solid fa-circle-check"></i> Water Safe for Direct Consumption
+            </p>
+          </div>
+
+          <!-- Structural Pipe Health Card -->
+          <div class="bg-brand-card/90 border border-brand-border rounded-2xl p-6 relative overflow-hidden">
+            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Infrastructure Integrity Index</span>
+            <div class="flex items-baseline gap-2 my-2">
+              <span id="ml-pipe-health" class="text-4xl sm:text-5xl font-display font-extrabold text-brand-cyan">91%</span>
+            </div>
+            <div class="w-full bg-brand-dark rounded-full h-3 overflow-hidden mb-3">
+              <div id="ml-pipe-bar" class="bg-brand-cyan h-3 rounded-full transition-all duration-300" style="width: 91%;"></div>
+            </div>
+            <p id="ml-pipe-status" class="text-xs text-slate-300">
+              Corrosion Rate: Low | Projected Lifespan: <span id="ml-pipe-lifespan" class="text-brand-cyan font-semibold">18+ Years</span>
+            </p>
+          </div>
+
+          <!-- Automated Action Recommendation -->
+          <div id="ml-action-box" class="p-4 rounded-xl bg-brand-surface/70 border border-brand-border text-xs text-slate-300 flex items-start gap-3">
+            <i class="fa-solid fa-wand-magic-sparkles text-brand-teal text-base mt-0.5"></i>
+            <div>
+              <span class="font-bold text-white block mb-0.5">Automated Utility Recommendation:</span>
+              <span id="ml-action-text">Nominal baseline state. Maintain current standard pumping cycle and scheduled maintenance schedules.</span>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= SECTION 5: LEAN CANVAS & CONCEPT NOTE VIEWER ================= -->
+  <section id="lean-canvas" class="py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-8">
+      
+      <div class="text-center max-w-3xl mx-auto mb-14">
+        <div class="inline-flex items-center gap-2 text-xs font-bold text-brand-teal uppercase tracking-wider mb-2">
+          <i class="fa-solid fa-briefcase"></i> Project Submission Dossier
+        </div>
+        <h2 class="text-3xl sm:text-4xl font-display font-bold text-white mb-4">
+          Lean Canvas &amp; Project Blueprint
+        </h2>
+        <p class="text-slate-400 text-sm sm:text-base">
+          Directly aligned with IBM SkillsBuild Masterclass 5 specifications and the United Nations Sustainable Development Goals.
+        </p>
+
+        <!-- Toggle View Buttons -->
+        <div class="inline-flex p-1.5 rounded-xl bg-brand-card border border-brand-border mt-6">
+          <button onclick="toggleDossierView('canvas')" id="btn-view-canvas" class="px-5 py-2 rounded-lg text-xs font-semibold bg-brand-cyan text-brand-dark transition-all">
+            Lean Canvas Grid (9 Pillars)
+          </button>
+          <button onclick="toggleDossierView('concept')" id="btn-view-concept" class="px-5 py-2 rounded-lg text-xs font-semibold text-slate-300 hover:text-white transition-all">
+            Concept Note Document
+          </button>
+        </div>
+      </div>
+
+      <!-- VIEW 1: LEAN CANVAS 9-BOX GRID -->
+      <div id="dossier-canvas-view" class="space-y-4">
+        
+        <!-- Top Row (Problem, Solution, UVP, Unfair Adv, Customer Segments) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+          
+          <!-- Box 1: Problem -->
+          <div class="bg-brand-surface/80 border border-brand-border rounded-xl p-5 hover:border-brand-cyan/40 transition-all flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between text-xs font-bold text-rose-400 uppercase tracking-wider mb-3">
+                <span>1. Problem</span>
+                <i class="fa-solid fa-triangle-exclamation"></i>
+              </div>
+              <ul class="text-xs text-slate-300 space-y-2.5">
+                <li class="flex items-start gap-2">
+                  <span class="text-brand-cyan">•</span>
+                  <span>Lack of real-time monitoring for contamination in rural &amp; municipal networks.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-brand-cyan">•</span>
+                  <span>Delayed response times to pathogen outbreaks due to 48-hour manual lab processes.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-brand-cyan">•</span>
+                  <span>Inefficient maintenance causing undetected pipe rupture and cross-contamination.</span>
+                </li>
+              </ul>
+            </div>
+            <div class="mt-4 pt-3 border-t border-brand-border/60 text-[11px] text-slate-400">
+              <b>Existing Alternatives:</b> Periodic manual sampling, point-of-use filters, fixed testing timetables.
+            </div>
+          </div>
+
+          <!-- Box 2: Solution -->
+          <div class="bg-brand-surface/80 border border-brand-border rounded-xl p-5 hover:border-brand-cyan/40 transition-all flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between text-xs font-bold text-brand-teal uppercase tracking-wider mb-3">
+                <span>4. Solution</span>
+                <i class="fa-solid fa-lightbulb"></i>
+              </div>
+              <ul class="text-xs text-slate-300 space-y-2.5">
+                <li class="flex items-start gap-2">
+                  <span class="text-brand-teal">•</span>
+                  <span>Deploy IoT sensor nodes testing pH, turbidity, heavy metals &amp; pathogen proxies continuously.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-brand-teal">•</span>
+                  <span>Automated real-time early warning SMS/alarms to municipal authorities upon anomaly detection.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-brand-teal">•</span>
+                  <span>Predictive ML models to forecast pipe degradation before physical fractures happen.</span>
+                </li>
+              </ul>
+            </div>
+            <div class="mt-4 pt-3 border-t border-brand-border/60 text-[11px] text-slate-400">
+              <b>Key Metrics:</b> Alerts resolved, response time reduction (%), volume safe, active nodes.
+            </div>
+          </div>
+
+          <!-- Box 3: UVP -->
+          <div class="bg-gradient-to-b from-brand-surface to-brand-card border-2 border-brand-cyan/50 rounded-xl p-5 shadow-glow-cyan flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between text-xs font-bold text-brand-cyan uppercase tracking-wider mb-3">
+                <span>3. Unique Value</span>
+                <i class="fa-solid fa-gem"></i>
+              </div>
+              <p class="text-sm font-semibold text-white leading-snug mb-3">
+                Continuous, AI-driven real-time water safety monitoring that detects contamination instantly, preventing waterborne outbreaks before water reaches consumer taps.
+              </p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-brand-border/60 text-xs text-cyan-300 font-medium">
+              <b>High-Level Concept:</b><br>"Smart security system for clean drinking water networks."
+            </div>
+          </div>
+
+          <!-- Box 4: Unfair Advantage -->
+          <div class="bg-brand-surface/80 border border-brand-border rounded-xl p-5 hover:border-brand-cyan/40 transition-all flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between text-xs font-bold text-amber-400 uppercase tracking-wider mb-3">
+                <span>9. Unfair Advantage</span>
+                <i class="fa-solid fa-award"></i>
+              </div>
+              <ul class="text-xs text-slate-300 space-y-2.5">
+                <li class="flex items-start gap-2">
+                  <span class="text-amber-400">•</span>
+                  <span>Proprietary predictive ML algorithms calibrated on local multi-seasonal water sensor datasets.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-amber-400">•</span>
+                  <span>Direct integration with municipal SCADA infrastructure for automated emergency shutoffs.</span>
+                </li>
+              </ul>
+            </div>
+            <div class="mt-4 pt-3 border-t border-brand-border/60 text-[11px] text-slate-400">
+              <b>Channels:</b> Water utility partnerships, public health NGOs, environmental safety expos.
+            </div>
+          </div>
+
+          <!-- Box 5: Customer Segments -->
+          <div class="bg-brand-surface/80 border border-brand-border rounded-xl p-5 hover:border-brand-cyan/40 transition-all flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between text-xs font-bold text-emerald-400 uppercase tracking-wider mb-3">
+                <span>2. Customer Segments</span>
+                <i class="fa-solid fa-users"></i>
+              </div>
+              <ul class="text-xs text-slate-300 space-y-2">
+                <li class="flex items-start gap-2">
+                  <span class="text-emerald-400">•</span>
+                  <span><b>Municipal Utilities:</b> City water departments and supply managers.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-emerald-400">•</span>
+                  <span><b>Rural Water Committees:</b> Village sanitation boards &amp; cooperatives.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-emerald-400">•</span>
+                  <span><b>Industrial Facilities:</b> High-purity manufacturing &amp; pharma plants.</span>
+                </li>
+              </ul>
+            </div>
+            <div class="mt-4 pt-3 border-t border-brand-border/60 text-[11px] text-slate-400">
+              <b>Early Adopters:</b> Flood-prone municipalities and rural clean water NGOs.
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Bottom Row (Cost Structure & Revenue Streams) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          
+          <!-- Cost Structure -->
+          <div class="bg-brand-card/90 border border-brand-border rounded-xl p-5">
+            <div class="flex items-center justify-between text-xs font-bold text-rose-400 uppercase tracking-wider mb-2">
+              <span>7. Cost Structure</span>
+              <i class="fa-solid fa-receipt"></i>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-slate-300 mt-2">
+              <div class="p-2.5 rounded bg-brand-surface/60 border border-brand-border/60">
+                <b>R&amp;D for AI Models:</b> Contamination forecasting &amp; pipe wear inference.
+              </div>
+              <div class="p-2.5 rounded bg-brand-surface/60 border border-brand-border/60">
+                <b>Hardware Sourcing:</b> Multi-sensor probes, microcontrollers &amp; enclosure assembly.
+              </div>
+              <div class="p-2.5 rounded bg-brand-surface/60 border border-brand-border/60">
+                <b>Cloud Telemetry Ops:</b> Server compute, time-series DBs &amp; LoRaWAN gateways.
+              </div>
+              <div class="p-2.5 rounded bg-brand-surface/60 border border-brand-border/60">
+                <b>Municipal Outreach:</b> Field engineering, compliance auditing &amp; marketing.
+              </div>
+            </div>
+          </div>
+
+          <!-- Revenue Streams -->
+          <div class="bg-brand-card/90 border border-brand-border rounded-xl p-5">
+            <div class="flex items-center justify-between text-xs font-bold text-emerald-400 uppercase tracking-wider mb-2">
+              <span>8. Revenue Streams</span>
+              <i class="fa-solid fa-coins"></i>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-slate-300 mt-2">
+              <div class="p-2.5 rounded bg-brand-surface/60 border border-brand-border/60">
+                <b>SaaS Subscription:</b> Utility recurring dashboard &amp; emergency alert licensing.
+              </div>
+              <div class="p-2.5 rounded bg-brand-surface/60 border border-brand-border/60">
+                <b>Hardware &amp; Setup:</b> Node installation fees and annual maintenance contracts (AMCs).
+              </div>
+              <div class="p-2.5 rounded bg-brand-surface/60 border border-brand-border/60">
+                <b>Government Analytics APIs:</b> Custom environmental data reports for state bodies.
+              </div>
+              <div class="p-2.5 rounded bg-brand-surface/60 border border-brand-border/60">
+                <b>Industrial SLA:</b> Specialized high-frequency purity compliance certifications.
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- VIEW 2: FORMAL CONCEPT NOTE VIEW -->
+      <div id="dossier-concept-view" class="hidden bg-brand-card border border-brand-border rounded-2xl p-6 sm:p-10 space-y-8 max-w-4xl mx-auto">
+        
+        <div class="border-b border-brand-border/80 pb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <span class="text-xs font-mono text-brand-cyan uppercase">Document No: HS-CN-2026-V1</span>
+            <h3 class="text-2xl font-display font-bold text-white mt-1">Project Concept Note: HydroSense AI</h3>
+            <p class="text-xs text-slate-400">Prepared for IBM SkillsBuild Innovation Masterclass Evaluation</p>
+          </div>
+          <button onclick="exportAuditReport()" class="px-4 py-2 rounded-xl text-xs font-semibold bg-brand-surface hover:bg-brand-dark border border-brand-border text-slate-200 transition-all flex items-center gap-2">
+            <i class="fa-solid fa-print text-brand-teal"></i>
+            <span>Printable Copy</span>
+          </button>
+        </div>
+
+        <div class="space-y-4 text-xs sm:text-sm text-slate-300 leading-relaxed">
+          <h4 class="text-base font-bold text-white flex items-center gap-2">
+            <span class="w-1.5 h-4 bg-brand-cyan rounded-full"></span>
+            1. Executive Summary &amp; Vision
+          </h4>
+          <p>
+            Contaminated drinking water distribution networks remain a primary vector for preventable waterborne illnesses worldwide. Conventional reliance on periodic manual sampling is fundamentally slow, leaving multi-day latency gaps where pathogens disperse before discovery. <b>HydroSense AI</b> deploys distributed edge-sensing nodes combined with predictive machine learning algorithms across water distribution pipes, providing instant contamination warnings and proactive structural maintenance.
+          </p>
+
+          <h4 class="text-base font-bold text-white flex items-center gap-2 pt-2">
+            <span class="w-1.5 h-4 bg-brand-teal rounded-full"></span>
+            2. Core Innovations &amp; Architecture
+          </h4>
+          <p>
+            Unlike static point-of-use filters, the platform functions at the municipal infrastructure level. By synthesizing optical turbidity, electrochemical pH, heavy metal trace indicators, and hydraulic pressure, our model distinguishes between harmless mineral changes and dangerous biological or chemical contamination.
+          </p>
+
+          <h4 class="text-base font-bold text-white flex items-center gap-2 pt-2">
+            <span class="w-1.5 h-4 bg-emerald-400 rounded-full"></span>
+            3. Alignment with UN Sustainable Development Goals
+          </h4>
+          <p>
+            • <b>UN SDG 6 (Clean Water and Sanitation - Target 6.1 &amp; 6.3):</b> Accelerates universal access to safe water and reduces untreated discharge pollution.<br>
+            • <b>UN SDG 3 (Good Health and Well-being):</b> Proactively interrupts the transmission chain of waterborne pathogens like cholera, typhoid, and dysentery.<br>
+            • <b>UN SDG 9 (Industry, Innovation &amp; Infrastructure):</b> Modernizes legacy municipal water grids with digital twin capabilities.
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= SECTION 6: SDG 6 IMPACT & ROI CALCULATOR ================= -->
+  <section id="calculator" class="py-16 bg-brand-slate border-y border-brand-border/80">
+    <div class="max-w-7xl mx-auto px-4 sm:px-8">
+      
+      <div class="max-w-3xl mx-auto text-center mb-12">
+        <div class="inline-flex items-center gap-2 text-xs font-bold text-brand-emerald uppercase tracking-wider mb-2">
+          <i class="fa-solid fa-calculator"></i> Socio-Economic Assessment
+        </div>
+        <h2 class="text-2xl sm:text-3xl font-display font-bold text-white">
+          SDG 6 Community ROI &amp; Health Impact Calculator
+        </h2>
+        <p class="text-slate-400 text-sm">
+          Estimate community-wide health savings, pathogen prevention rates, and lab-testing cost reductions based on population size.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center max-w-5xl mx-auto">
+        
+        <!-- Calculator Inputs (6 cols) -->
+        <div class="lg:col-span-6 bg-brand-card/90 border border-brand-border rounded-2xl p-6 space-y-5">
+          <h3 class="text-sm font-bold text-white uppercase tracking-wider">Demographic Parameters</h3>
+          
+          <div>
+            <label class="block text-xs text-slate-300 font-semibold mb-1">Target Community / Municipality Population</label>
+            <div class="flex items-center gap-3">
+              <input type="range" id="calc-pop-slider" min="10000" max="1000000" step="10000" value="150000" oninput="updateImpactCalc()" class="w-full accent-brand-emerald cursor-pointer bg-brand-dark rounded-lg h-2">
+              <span id="calc-pop-display" class="font-mono text-sm font-bold text-brand-emerald min-w-[90px] text-right">150,000</span>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs text-slate-300 font-semibold mb-1">Network Type</label>
+            <select id="calc-grid-type" onchange="updateImpactCalc()" class="w-full px-3 py-2 rounded-xl bg-brand-dark border border-brand-border text-xs text-slate-200 focus:outline-none focus:border-brand-emerald">
+              <option value="municipal">Urban Municipal Water Utility</option>
+              <option value="rural">Rural Borewell &amp; Feeder Network</option>
+              <option value="mixed">Semi-Urban Mixed District</option>
+            </select>
+          </div>
+
+          <div class="p-3.5 rounded-xl bg-brand-surface/60 border border-brand-border/60 text-xs text-slate-400 space-y-1">
+            <p><b>Baseline Methodology:</b> Calculations reflect WHO epidemiologic waterborne infection rates (est. 4.2% annual exposure risk in developing utility pipelines) contrasted with sub-minute AI isolation.</p>
+          </div>
+        </div>
+
+        <!-- Calculated Impact Outputs (6 cols) -->
+        <div class="lg:col-span-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+          
+          <!-- Stat 1 -->
+          <div class="bg-brand-surface/90 border border-brand-border rounded-2xl p-5 text-center">
+            <div class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center mx-auto mb-3">
+              <i class="fa-solid fa-hospital-user text-lg"></i>
+            </div>
+            <div id="calc-out-cases" class="text-2xl sm:text-3xl font-display font-bold text-emerald-400">4,725</div>
+            <p class="text-xs text-slate-300 mt-1 font-medium">Prevented Illness Cases / Year</p>
+            <p class="text-[10px] text-slate-500">Waterborne diarrhea, cholera &amp; typhoid</p>
+          </div>
+
+          <!-- Stat 2 -->
+          <div class="bg-brand-surface/90 border border-brand-border rounded-2xl p-5 text-center">
+            <div class="w-10 h-10 rounded-xl bg-cyan-500/10 text-brand-cyan flex items-center justify-center mx-auto mb-3">
+              <i class="fa-solid fa-hand-holding-dollar text-lg"></i>
+            </div>
+            <div id="calc-out-savings" class="text-2xl sm:text-3xl font-display font-bold text-brand-cyan">$142,500</div>
+            <p class="text-xs text-slate-300 mt-1 font-medium">Annual Lab &amp; Healthcare Savings</p>
+            <p class="text-[10px] text-slate-500">Eliminates outsourced manual testing</p>
+          </div>
+
+          <!-- Stat 3 -->
+          <div class="bg-brand-surface/90 border border-brand-border rounded-2xl p-5 text-center">
+            <div class="w-10 h-10 rounded-xl bg-teal-500/10 text-brand-teal flex items-center justify-center mx-auto mb-3">
+              <i class="fa-solid fa-stopwatch-20 text-lg"></i>
+            </div>
+            <div class="text-2xl sm:text-3xl font-display font-bold text-brand-teal">96.8%</div>
+            <p class="text-xs text-slate-300 mt-1 font-medium">Response Latency Reduction</p>
+            <p class="text-[10px] text-slate-500">Down from 48h to &lt; 90 seconds</p>
+          </div>
+
+          <!-- Stat 4 -->
+          <div class="bg-brand-surface/90 border border-brand-border rounded-2xl p-5 text-center">
+            <div class="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center mx-auto mb-3">
+              <i class="fa-solid fa-faucet-drip text-lg"></i>
+            </div>
+            <div id="calc-out-water" class="text-2xl sm:text-3xl font-display font-bold text-blue-400">18.2M L</div>
+            <p class="text-xs text-slate-300 mt-1 font-medium">Clean Water Preserved</p>
+            <p class="text-[10px] text-slate-500">Saved from pipeline flushing wastes</p>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= SECTION 7: EXPORT MODAL / AUDIT REPORT GENERATOR ================= -->
+  <div id="audit-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-brand-card border border-brand-border rounded-2xl max-w-2xl w-full p-6 sm:p-8 space-y-5 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-brand-border pb-4">
+        <div>
+          <h3 class="text-lg font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-clipboard-check text-brand-cyan"></i>
+            HydroSense AI - Water Network Audit Report
+          </h3>
+          <p class="text-xs text-slate-400">Generated for IBM SkillsBuild Submission Review</p>
+        </div>
+        <button onclick="closeAuditModal()" class="text-slate-400 hover:text-white text-lg">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div id="audit-report-body" class="space-y-4 text-xs font-mono bg-brand-dark p-4 rounded-xl border border-brand-border text-slate-300">
+        <!-- Injected via JavaScript -->
+      </div>
+
+      <div class="flex justify-end space-x-3 pt-2">
+        <button onclick="closeAuditModal()" class="px-4 py-2 rounded-xl text-xs font-semibold bg-brand-surface text-slate-300">Close</button>
+        <button onclick="window.print()" class="px-4 py-2 rounded-xl text-xs font-semibold bg-brand-cyan text-brand-dark flex items-center gap-2">
+          <i class="fa-solid fa-print"></i> Print / Save as PDF
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= FOOTER & PROJECT METADATA ================= -->
+  <footer class="bg-brand-dark border-t border-brand-border/70 py-12 text-slate-400 text-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-8 flex flex-col md:flex-row justify-between items-center gap-6">
+      
+      <div class="flex items-center space-x-3">
+        <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-brand-cyan to-brand-teal flex items-center justify-center text-brand-dark">
+          <i class="fa-solid fa-shield-halved text-sm"></i>
+        </div>
+        <div>
+          <span class="font-display font-bold text-sm text-white">HydroSense AI</span>
+          <p class="text-[10px] text-slate-500">Autonomous Clean Water Early-Warning Defense Network</p>
+        </div>
+      </div>
+
+      <div class="text-center md:text-left">
+        <p class="text-slate-300">IBM SkillsBuild Masterclass 5: Creating Real Life Projects</p>
+        <p class="text-slate-500 text-[11px]">Aligned with United Nations SDG 6 (Clean Water &amp; Sanitation) &amp; SDG 3</p>
+      </div>
+
+      <div class="flex items-center space-x-4">
+        <a href="#hero" class="hover:text-brand-cyan transition-colors">Top</a>
+        <span>•</span>
+        <a href="#simulation" class="hover:text-brand-cyan transition-colors">Grid Simulator</a>
+        <span>•</span>
+        <a href="#lean-canvas" class="hover:text-brand-cyan transition-colors">Lean Canvas</a>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- ================= JAVASCRIPT SIMULATION LOGIC ================= -->
+  <script>
+    /* State Management */
+    const state = {
+      activeNode: 'A',
+      nodes: {
+        A: { name: 'Node A (Municipal Metro)', ph: 7.24, turbidity: 1.12, metals: 0.02, pathogen: 4.8, pressure: 4.1, burstRisk: 8.2, status: 'NORMAL', valve: 'OPEN' },
+        B: { name: 'Node B (Rural Outpost)', ph: 7.08, turbidity: 2.30, metals: 0.03, pathogen: 6.2, pressure: 3.5, burstRisk: 14.5, status: 'NORMAL', valve: 'OPEN' },
+        C: { name: 'Node C (Industrial Buffer)', ph: 7.40, turbidity: 0.85, metals: 0.01, pathogen: 1.5, pressure: 5.2, burstRisk: 6.0, status: 'NORMAL', valve: 'OPEN' }
+      },
+      chart: null,
+      chartLabels: ['-20s', '-16s', '-12s', '-8s', '-4s', 'Now'],
+      chartTurbidity: [1.2, 1.15, 1.10, 1.25, 1.18, 1.12],
+      chartPh: [7.2, 7.22, 7.25, 7.21, 7.23, 7.24],
+      isSimulatedSpike: false,
+      incidentsPrevented: 14
+    };
+
+    /* Initialize Live Chart.js */
+    function initChart() {
+      const ctx = document.getElementById('liveChart').getContext('2d');
+      state.chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: state.chartLabels,
+          datasets: [
+            {
+              label: 'Turbidity (NTU)',
+              data: state.chartTurbidity,
+              borderColor: '#06b6d4',
+              backgroundColor: 'rgba(6, 182, 212, 0.12)',
+              borderWidth: 2.5,
+              tension: 0.35,
+              fill: true,
+              yAxisID: 'y'
+            },
+            {
+              label: 'pH Level',
+              data: state.chartPh,
+              borderColor: '#10b981',
+              backgroundColor: 'transparent',
+              borderWidth: 2,
+              borderDash: [5, 4],
+              tension: 0.2,
+              yAxisID: 'y1'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: { duration: 600 },
+          scales: {
+            x: {
+              grid: { color: 'rgba(30, 51, 90, 0.4)' },
+              ticks: { color: '#94a3b8', font: { size: 10 } }
+            },
+            y: {
+              type: 'linear',
+              position: 'left',
+              min: 0,
+              max: 15,
+              grid: { color: 'rgba(30, 51, 90, 0.4)' },
+              ticks: { color: '#06b6d4', font: { size: 10 } },
+              title: { display: true, text: 'Turbidity (NTU)', color: '#06b6d4', font: { size: 10 } }
+            },
+            y1: {
+              type: 'linear',
+              position: 'right',
+              min: 5,
+              max: 10,
+              grid: { drawOnChartArea: false },
+              ticks: { color: '#10b981', font: { size: 10 } },
+              title: { display: true, text: 'pH Level', color: '#10b981', font: { size: 10 } }
+            }
+          },
+          plugins: {
+            legend: { display: false }
+          }
+        }
+      });
+    }
+
+    /* Node Switching */
+    function selectNode(nodeId) {
+      state.activeNode = nodeId;
+      
+      // Update Tab Styles
+      ['A', 'B', 'C'].forEach(id => {
+        const btn = document.getElementById(`btn-node-${id}`);
+        if (id === nodeId) {
+          btn.className = 'p-3 rounded-xl border border-brand-cyan/60 bg-brand-surface text-left transition-all';
+        } else {
+          btn.className = 'p-3 rounded-xl border border-brand-border bg-brand-dark/50 text-left hover:border-slate-500 transition-all';
+        }
+      });
+
+      document.getElementById('active-node-tag').innerText = `Node ${nodeId} Selected`;
+      updateNodeDashboard();
+      addLogMessage(`[NODE_SWITCH] Active operator perspective redirected to Node ${nodeId}.`, 'cyan');
+    }
+
+    /* Update Dashboard Values */
+    function updateNodeDashboard() {
+      const node = state.nodes[state.activeNode];
+      
+      document.getElementById('val-ph').innerText = node.ph.toFixed(2);
+      document.getElementById('val-turbidity').innerText = node.turbidity.toFixed(2);
+      document.getElementById('val-metals').innerText = node.metals.toFixed(2);
+      document.getElementById('val-pathogen').innerText = node.pathogen.toFixed(1);
+      document.getElementById('val-pressure').innerText = `${node.pressure.toFixed(1)} bar (${node.pressure < 2.5 ? 'CRITICAL LEAK' : 'Nominal'})`;
+      document.getElementById('val-burst-risk').innerText = `${node.burstRisk > 50 ? 'CRITICAL RISK' : 'Low Risk'} (${node.burstRisk.toFixed(1)}%)`;
+
+      // Update progress widths
+      document.getElementById('bar-ph').style.width = `${Math.min(100, (node.ph / 14) * 100)}%`;
+      document.getElementById('bar-turbidity').style.width = `${Math.min(100, (node.turbidity / 15) * 100)}%`;
+      document.getElementById('bar-metals').style.width = `${Math.min(100, (node.metals / 0.2) * 100)}%`;
+      document.getElementById('bar-pathogen').style.width = `${node.pathogen}%`;
+      document.getElementById('bar-burst-risk').style.width = `${node.burstRisk}%`;
+      document.getElementById('bar-pressure').style.width = `${(node.pressure / 6) * 100}%`;
+
+      // Color indicators
+      const isCritical = node.status === 'CRITICAL';
+      const mapDot = document.getElementById(`map-dot-${state.activeNode}`);
+      
+      if (isCritical) {
+        mapDot.setAttribute('fill', '#ef4444');
+        document.getElementById('valve-state-text').innerHTML = '<span class="text-rose-400 font-bold">AUTOMATICALLY ISOLATED (Valve Closed)</span>';
+        document.getElementById('grid-status-badge').className = 'px-2 py-0.5 rounded text-[11px] font-semibold bg-rose-500/20 text-rose-400 border border-rose-500/30';
+        document.getElementById('grid-status-badge').innerText = 'Contamination Detected - Pipe Blocked';
+      } else {
+        mapDot.setAttribute('fill', '#10b981');
+        document.getElementById('valve-state-text').innerHTML = '<span class="text-emerald-400 font-semibold">Open (Normal Flow)</span>';
+        document.getElementById('grid-status-badge').className = 'px-2 py-0.5 rounded text-[11px] font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
+        document.getElementById('grid-status-badge').innerText = 'Pipes Pressurized: Normal';
+      }
+    }
+
+    /* Simulation 1: Contamination Spike */
+    function triggerContaminationSpike() {
+      state.isSimulatedSpike = true;
+      const node = state.nodes[state.activeNode];
+      
+      // Inject hazardous values
+      node.ph = 5.35; // Acidic deviation
+      node.turbidity = 12.80; // High turbidity
+      node.metals = 0.16; // Toxic heavy metals surge
+      node.pathogen = 88.5; // High pathogen risk
+      node.status = 'CRITICAL';
+      node.valve = 'CLOSED';
+
+      // Pipe visual danger
+      document.getElementById('pipe-ab').classList.add('flow-danger');
+      document.getElementById('pipe-bc').classList.add('flow-danger');
+
+      // Update Chart with shock spike
+      state.chartTurbidity[state.chartTurbidity.length - 1] = 12.8;
+      state.chartPh[state.chartPh.length - 1] = 5.35;
+      state.chart.update();
+
+      updateNodeDashboard();
+
+      // Trigger Alert Logs
+      addLogMessage(`[CRITICAL_ALARM] Node ${state.activeNode}: Turbidity spike (${node.turbidity} NTU) & Heavy Metals surge (${node.metals} ppm)!`, 'rose');
+      addLogMessage(`[AUTO_MITIGATION] Solenoid Valve #SV-${state.activeNode}01 shut down automatically in 0.82 seconds.`, 'amber');
+      addLogMessage(`[BROADCAST_SENT] Emergency SMS sent to Municipal Health Board & WhatsApp Community Hotline.`, 'cyan');
+
+      state.incidentsPrevented += 1;
+      document.getElementById('kpi-incidents-prevented').innerText = state.incidentsPrevented;
+    }
+
+    /* Simulation 2: Pipe Wear & Burst */
+    function triggerPipeBurst() {
+      const node = state.nodes[state.activeNode];
+      node.pressure = 1.4; // Pressure drop indicating leak
+      node.burstRisk = 94.2; // Critical degradation
+      node.status = 'CRITICAL';
+
+      updateNodeDashboard();
+
+      addLogMessage(`[BURST_WARNING] Node ${state.activeNode}: Hydraulic pressure plunged to ${node.pressure} bar.`, 'rose');
+      addLogMessage(`[ML_MAINTENANCE] LSTM model predicts 98% likelihood of major underground pipe rupture. Dispatching repair crew.`, 'amber');
+    }
+
+    /* Reset Simulation */
+    function resetSimulation() {
+      state.isSimulatedSpike = false;
+      state.nodes = {
+        A: { name: 'Node A (Municipal Metro)', ph: 7.24, turbidity: 1.12, metals: 0.02, pathogen: 4.8, pressure: 4.1, burstRisk: 8.2, status: 'NORMAL', valve: 'OPEN' },
+        B: { name: 'Node B (Rural Outpost)', ph: 7.08, turbidity: 2.30, metals: 0.03, pathogen: 6.2, pressure: 3.5, burstRisk: 14.5, status: 'NORMAL', valve: 'OPEN' },
+        C: { name: 'Node C (Industrial Buffer)', ph: 7.40, turbidity: 0.85, metals: 0.01, pathogen: 1.5, pressure: 5.2, burstRisk: 6.0, status: 'NORMAL', valve: 'OPEN' }
+      };
+
+      document.getElementById('pipe-ab').classList.remove('flow-danger');
+      document.getElementById('pipe-bc').classList.remove('flow-danger');
+
+      ['A', 'B', 'C'].forEach(id => {
+        document.getElementById(`map-dot-${id}`).setAttribute('fill', '#10b981');
+      });
+
+      state.chartTurbidity = [1.2, 1.15, 1.10, 1.25, 1.18, 1.12];
+      state.chartPh = [7.2, 7.22, 7.25, 7.21, 7.23, 7.24];
+      state.chart.data.datasets[0].data = state.chartTurbidity;
+      state.chart.data.datasets[1].data = state.chartPh;
+      state.chart.update();
+
+      updateNodeDashboard();
+      addLogMessage(`[SYSTEM_RESET] Grid returned to normal nominal baseline values. Solenoids opened.`, 'emerald');
+    }
+
+    /* Append Event Log */
+    function addLogMessage(msg, color) {
+      const logContainer = document.getElementById('alert-logs');
+      const item = document.createElement('div');
+      
+      let borderCol = 'border-cyan-400';
+      if (color === 'rose') borderCol = 'border-rose-500 bg-rose-500/10 text-rose-200';
+      else if (color === 'amber') borderCol = 'border-amber-400 bg-amber-500/10 text-amber-200';
+      else if (color === 'emerald') borderCol = 'border-emerald-400 text-emerald-200';
+      else borderCol = 'border-cyan-400 text-cyan-200';
+
+      item.className = `p-2 rounded bg-brand-surface/70 border-l-2 ${borderCol} flex items-center justify-between text-[11px]`;
+      item.innerHTML = `<span>${msg}</span><span class="text-[9px] text-slate-500">Just now</span>`;
+      
+      logContainer.insertBefore(item, logContainer.firstChild);
+    }
+
+    function clearAlertLogs() {
+      document.getElementById('alert-logs').innerHTML = `
+        <div class="p-2 rounded bg-brand-surface/70 border-l-2 border-slate-500 text-slate-400 flex items-center justify-between">
+          <span>[LOGS_CLEARED] Buffer purged by user.</span>
+          <span class="text-[10px] text-slate-500">Just now</span>
+        </div>`;
+    }
+
+    /* Live Telemetry Loop */
+    setInterval(() => {
+      if (!state.isSimulatedSpike) {
+        const node = state.nodes[state.activeNode];
+        // small natural fluctuations
+        node.turbidity = Math.max(0.6, node.turbidity + (Math.random() * 0.1 - 0.05));
+        node.ph = Math.max(6.8, Math.min(7.8, node.ph + (Math.random() * 0.04 - 0.02)));
+
+        state.chartTurbidity.shift();
+        state.chartTurbidity.push(parseFloat(node.turbidity.toFixed(2)));
+
+        state.chartPh.shift();
+        state.chartPh.push(parseFloat(node.ph.toFixed(2)));
+
+        if (state.chart) {
+          state.chart.data.datasets[0].data = state.chartTurbidity;
+          state.chart.data.datasets[1].data = state.chartPh;
+          state.chart.update('none');
+        }
+
+        document.getElementById('val-ph').innerText = node.ph.toFixed(2);
+        document.getElementById('val-turbidity').innerText = node.turbidity.toFixed(2);
+      }
+    }, 2500);
+
+    /* ================= ML SANDBOX CALCULATION ================= */
+    function calculateMLRisk() {
+      const age = parseFloat(document.getElementById('slider-pipe-age').value);
+      const pressureVar = parseFloat(document.getElementById('slider-pressure-var').value);
+      const metals = parseFloat(document.getElementById('slider-metals-trace').value);
+      const turbidity = parseFloat(document.getElementById('slider-turbidity-surge').value);
+
+      document.getElementById('pipe-age-val').innerText = `${age} Years`;
+      document.getElementById('pressure-var-val').innerText = `± ${pressureVar.toFixed(1)} bar`;
+      document.getElementById('metals-trace-val').innerText = `${metals.toFixed(2)} ppm`;
+      document.getElementById('turbidity-surge-val').innerText = `${turbidity.toFixed(1)} NTU`;
+
+      // Heuristic model simulation representing XGBoost risk score
+      let riskScore = (metals * 120) + (turbidity * 2.5) + (age * 0.4) + (pressureVar * 8);
+      riskScore = Math.min(100, Math.max(2, Math.round(riskScore)));
+
+      // Structural health
+      let pipeHealth = 100 - (age * 1.5) - (pressureVar * 10);
+      pipeHealth = Math.min(100, Math.max(10, Math.round(pipeHealth)));
+
+      document.getElementById('ml-risk-score').innerText = riskScore;
+      document.getElementById('ml-risk-bar').style.width = `${riskScore}%`;
+
+      document.getElementById('ml-pipe-health').innerText = `${pipeHealth}%`;
+      document.getElementById('ml-pipe-bar').style.width = `${pipeHealth}%`;
+
+      const lifespan = Math.max(1, Math.round(pipeHealth / 4.5));
+      document.getElementById('ml-pipe-lifespan').innerText = `${lifespan} Years`;
+
+      const riskDisplay = document.getElementById('ml-risk-status');
+      const actionText = document.getElementById('ml-action-text');
+
+      if (riskScore > 65) {
+        document.getElementById('ml-risk-score').className = 'text-4xl sm:text-5xl font-display font-extrabold text-rose-400';
+        document.getElementById('ml-risk-bar').className = 'bg-rose-500 h-3 rounded-full transition-all duration-300';
+        riskDisplay.className = 'text-xs text-rose-400 font-semibold flex items-center gap-1.5';
+        riskDisplay.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> CRITICAL: Water Contamination Hazardous';
+        actionText.innerText = 'Immediately trigger solenoid cutoff, broadcast boil-water advisory to district authorities, and dispatch field test team.';
+      } else if (riskScore > 35) {
+        document.getElementById('ml-risk-score').className = 'text-4xl sm:text-5xl font-display font-extrabold text-amber-400';
+        document.getElementById('ml-risk-bar').className = 'bg-amber-400 h-3 rounded-full transition-all duration-300';
+        riskDisplay.className = 'text-xs text-amber-400 font-semibold flex items-center gap-1.5';
+        riskDisplay.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> ELEVATED: Advisory Water Safety Threshold';
+        actionText.innerText = 'Increase inline chlorine dosing, adjust regional pump pressure, and double telemetry sampling rate.';
+      } else {
+        document.getElementById('ml-risk-score').className = 'text-4xl sm:text-5xl font-display font-extrabold text-emerald-400';
+        document.getElementById('ml-risk-bar').className = 'bg-emerald-400 h-3 rounded-full transition-all duration-300';
+        riskDisplay.className = 'text-xs text-emerald-400 font-semibold flex items-center gap-1.5';
+        riskDisplay.innerHTML = '<i class="fa-solid fa-circle-check"></i> Water Safe for Direct Consumption';
+        actionText.innerText = 'Nominal baseline state. Maintain current standard pumping cycle and scheduled maintenance schedules.';
+      }
+    }
+
+    function resetSliders() {
+      document.getElementById('slider-pipe-age').value = 12;
+      document.getElementById('slider-pressure-var').value = 0.4;
+      document.getElementById('slider-metals-trace').value = 0.01;
+      document.getElementById('slider-turbidity-surge').value = 1.2;
+      calculateMLRisk();
+    }
+
+    /* ================= TOGGLE DOSSIER VIEW ================= */
+    function toggleDossierView(view) {
+      const canvasView = document.getElementById('dossier-canvas-view');
+      const conceptView = document.getElementById('dossier-concept-view');
+      const btnCanvas = document.getElementById('btn-view-canvas');
+      const btnConcept = document.getElementById('btn-view-concept');
+
+      if (view === 'canvas') {
+        canvasView.classList.remove('hidden');
+        conceptView.classList.add('hidden');
+        btnCanvas.className = 'px-5 py-2 rounded-lg text-xs font-semibold bg-brand-cyan text-brand-dark transition-all';
+        btnConcept.className = 'px-5 py-2 rounded-lg text-xs font-semibold text-slate-300 hover:text-white transition-all';
+      } else {
+        canvasView.classList.add('hidden');
+        conceptView.classList.remove('hidden');
+        btnConcept.className = 'px-5 py-2 rounded-lg text-xs font-semibold bg-brand-cyan text-brand-dark transition-all';
+        btnCanvas.className = 'px-5 py-2 rounded-lg text-xs font-semibold text-slate-300 hover:text-white transition-all';
+      }
+    }
+
+    function openLeanCanvasModal() {
+      const elem = document.getElementById('lean-canvas');
+      elem.scrollIntoView({ behavior: 'smooth' });
+      toggleDossierView('canvas');
+    }
+
+    /* ================= SDG 6 CALCULATOR ================= */
+    function updateImpactCalc() {
+      const pop = parseInt(document.getElementById('calc-pop-slider').value);
+      document.getElementById('calc-pop-display').innerText = pop.toLocaleString();
+
+      // Cases prevented (roughly 3.15% community impact)
+      const cases = Math.round(pop * 0.0315);
+      document.getElementById('calc-out-cases').innerText = cases.toLocaleString();
+
+      // Monetary savings (lab fees + medical burdens saved)
+      const savings = Math.round(pop * 0.95);
+      document.getElementById('calc-out-savings').innerText = `$${savings.toLocaleString()}`;
+
+      // Water preserved from line flushes
+      const waterLiters = (pop * 0.12).toFixed(1);
+      document.getElementById('calc-out-water').innerText = `${waterLiters}M L`;
+    }
+
+    /* ================= AUDIT REPORT EXPORT ================= */
+    function exportAuditReport() {
+      const activeNode = state.nodes[state.activeNode];
+      const now = new Date();
+      const reportHtml = `
+        <div class="space-y-3">
+          <div class="border-b border-brand-border pb-2">
+            <p class="text-white font-bold text-sm">HYDROSENSE AI AUDIT VERIFICATION CERTIFICATE</p>
+            <p class="text-slate-400">Timestamp: ${now.toUTCString()} | Grid Node ID: #NODE-${state.activeNode}</p>
+          </div>
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <div><span class="text-slate-400">Target Node:</span> <span class="text-white font-bold">${activeNode.name}</span></div>
+            <div><span class="text-slate-400">Current Isolation Valve:</span> <span class="text-emerald-400 font-bold">${activeNode.valve}</span></div>
+            <div><span class="text-slate-400">Measured pH:</span> <span class="text-white">${activeNode.ph.toFixed(2)}</span></div>
+            <div><span class="text-slate-400">Measured Turbidity:</span> <span class="text-white">${activeNode.turbidity.toFixed(2)} NTU</span></div>
+            <div><span class="text-slate-400">Heavy Metals Index:</span> <span class="text-white">${activeNode.metals.toFixed(2)} ppm</span></div>
+            <div><span class="text-slate-400">Line Pressure:</span> <span class="text-white">${activeNode.pressure.toFixed(1)} bar</span></div>
+          </div>
+          <div class="p-2.5 rounded bg-brand-surface border border-brand-border/60">
+            <span class="text-slate-400">AI Safety Verdict:</span>
+            <p class="text-white font-bold mt-1">${activeNode.status === 'NORMAL' ? 'NOMINAL: Water fully certified compliant with WHO standards.' : 'HAZARDOUS: Contamination alert active. Downstream shutoff initiated.'}</p>
+          </div>
+          <p class="text-[10px] text-slate-500">Project track: IBM SkillsBuild Masterclass 5 | Aligned with UN SDG 6: Clean Water and Sanitation.</p>
+        </div>
+      `;
+      document.getElementById('audit-report-body').innerHTML = reportHtml;
+      document.getElementById('audit-modal').classList.remove('hidden');
+      document.getElementById('audit-modal').classList.add('flex');
+    }
+
+    function closeAuditModal() {
+      document.getElementById('audit-modal').classList.add('hidden');
+      document.getElementById('audit-modal').classList.remove('flex');
+    }
+
+    // Initialize on window load
+    window.onload = function() {
+      initChart();
+      calculateMLRisk();
+      updateImpactCalc();
+    };
+  </script>
+</body>
+</html>
