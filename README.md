@@ -45,4 +45,3 @@ The dashboard continuously simulates and analyzes the following primary indicato
 hydrosense-web/
 ├── index.html          # Complete standalone web application (UI, CSS, JS, Chart.js)
 ├── README.md           # Documentation for the web platform
-└── assets/             # (Optional) Static branding or export resources
